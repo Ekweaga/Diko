@@ -10,21 +10,33 @@ import './def.css';
 import axios from 'axios';
 
 
-function Definition() {
+function Definition({add,bookmarks,remove}) {
   const history = useHistory()
+  const [isbook,setisbook] = useState()
   const {id} = useParams()
   const [loading,setloading]= useState(true)
   const [exist,setexist] = useState(true)
-  const [definitions, setdefinitions] = useState([])
+  const [definitions, setdefinitions] = useState([]);
+  const [audio,setaudio] = useState(null);
   
+  const isbookmarked = Object.keys(bookmarks).includes(id);
+
+  const update = data =>{
+ 
+  
+    setdefinitions(data)
+    const phonetics = data[0].phonetics
+    if(!phonetics.length) return;
+    const url = phonetics[0].audio.replace('//ssl', 'https://ssl')
+    setaudio(new Audio(url))
+  }
 
   useEffect(()=>{
     const fetchdata = async ()=>{
       try{
         const res = await axios.get(`https://api.dictionaryapi.dev/api/v2/entries/en/${id}`)
-        setloading(false)
-        console.log(res.data)
-        setdefinitions(res.data)
+       update(res.data)
+      
       }
       catch(err){
           setexist(false)
@@ -32,13 +44,17 @@ function Definition() {
     
 
     }
-    fetchdata();
+    if(!isbookmarked) fetchdata();
+    else{
+      update(bookmarks[id])
+    }
+    
   },[])
             if(!exist) return (<div style={{display:'flex', flexDirection:'column', alignItems:'center',justifyContent:'center',height:'100vh'}}>
                <p style={{fontSize:'15px',fontWeight:'bold'}}> Word not Found</p><br/><br/>
                 <button onClick={history.goBack} style={{backgroundColor:'blue',color:'white' ,borderRadius:'16px', boxShadow:'8px 18px 25px rgba(0,0,0,0.15)',padding:'10px',width:'200px',border:'none'}}>Go Back</button>
             </div>)
-          if(loading) return (<div style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh'}}>
+          if(!definitions.length) return (<div style={{display:'flex',alignItems:'center',justifyContent:'center',height:'100vh'}}>
             <CircularProgress/>
             </div>)
 
@@ -47,7 +63,12 @@ function Definition() {
     
      <>
      <div className='back'> <ArrowBack onClick = {history.goBack} style={{cursor:'pointer'}}/>
-      <Bookmark/></div>
+      <Bookmark onClick={()=>isbookmarked ? remove(id):add(id,definitions)}/></div>
+    {isbookmarked && 
+      (<div style={{display:'flex',justifyContent:'center',alignItems:'center',marginBottom:'25px',backgroundColor:'black',color:'white',width:'80%',margin:'auto'}}>
+      <p>Word Saved</p>
+      </div>)
+    }
     
       <div className="word">
         <div style={{display:'flex',flexDirection:'column',alignItems:'center',justifyContent:'center'}}>
@@ -56,7 +77,7 @@ function Definition() {
         </div>
         
         <IconButton style={{backgroundColor:'blue',color:'white' ,borderRadius:'16px', boxShadow:'8px 18px 25px rgba(0,0,0,0.15)'}}>
-           <PlayArrowIcon />
+          {audio && <PlayArrowIcon onClick={()=>audio.play()}/>}
            </IconButton>
       </div>
 
