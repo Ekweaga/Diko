@@ -20,6 +20,9 @@ function Definition({add,bookmarks,remove}) {
   const [audio,setaudio] = useState(null);
   
   const isbookmarked = Object.keys(bookmarks).includes(id);
+  const bok = ()=>{
+    window.location.assign("/bookmarks")
+  }
 
   const update = data =>{
  
@@ -65,8 +68,8 @@ function Definition({add,bookmarks,remove}) {
      <div className='back'> <ArrowBack onClick = {history.goBack} style={{cursor:'pointer'}}/>
       <Bookmark onClick={()=>isbookmarked ? remove(id):add(id,definitions)}/></div>
     {isbookmarked && 
-      (<div style={{display:'flex',justifyContent:'center',alignItems:'center',marginBottom:'25px',backgroundColor:'black',color:'white',width:'80%',margin:'auto'}}>
-      <p>Word Saved</p>
+      (<div style={{display:'flex',justifyContent:'center',alignItems:'center',marginBottom:'25px',color:'red',width:'80%',margin:'auto'}}>
+      <p onClick={bok}>Word Saved</p>
       </div>)
     }
     
