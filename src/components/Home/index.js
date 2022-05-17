@@ -42,11 +42,7 @@ function Home() {
       
     }
     return (
-      <Box 
-      sx=
-      {{
-      display:'flex'
-      }}>
+     
         <div className='box'>
           <img src={diko}/>
          
@@ -69,7 +65,7 @@ function Home() {
              </div>
             
          
-      </Box>
+     
     )
   }
   
